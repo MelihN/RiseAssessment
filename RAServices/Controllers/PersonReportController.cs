@@ -28,17 +28,9 @@ namespace RAServices.Controllers
         {
             var result = new ResponseModel<PersonReport>();
             var postData = new DbModel<Person>();
-            var reportStateInfo = await SetReportState(new ReportQueryInfo() { 
-                UUID = new string(Guid.NewGuid().ToString()), 
-                ReportState =ReportQueryStates.reportQueryStates.First(x => x.StateValue == "S1").StateName, 
-                RequestDate = DateTime.Now });
-
+            
             var mongoRepo = new MongoRepository(connectionString, dbName, "Person");
             var data = await mongoRepo.GetDataList<Person>(postData);
-
-            reportStateInfo.Item.ReportState = ReportQueryStates.reportQueryStates.First(x => x.StateValue == "S2").StateName;
-            reportStateInfo.Item.RequestDate = DateTime.Now;
-            reportStateInfo = await UpdateReportState(reportStateInfo.Item);
 
             if (data.State)
             {
@@ -73,14 +65,27 @@ namespace RAServices.Controllers
             result.RequestState = data.State;
             result.ServiceState = true;
 
-            reportStateInfo.Item.ReportState = ReportQueryStates.reportQueryStates.First(x => x.StateValue == "S3").StateName;
-            reportStateInfo.Item.RequestDate = DateTime.Now;
-            reportStateInfo = await UpdateReportState(reportStateInfo.Item);
+            return result;
+        }
+
+        [HttpPost]
+        public async Task<ResponseModel<ReportQueryInfo>> GetReportState(ReportQueryInfo model)
+        {
+            var result = new ResponseModel<ReportQueryInfo>();
+            var postData = new DbModel<ReportQueryInfo>() { RecordID = model.UUID };
+
+            var data = await _mongoRepository.GetFindOne<ReportQueryInfo>(postData);
+
+            result.Item = data.Item;
+            result.ErrorMsg = data.ErrorMsg;
+            result.RequestState = data.State;
+            result.ServiceState = true;
 
             return result;
         }
 
-        private async Task<ResponseModel<ReportQueryInfo>> SetReportState(ReportQueryInfo model)
+        [HttpPost]
+        public async Task<ResponseModel<ReportQueryInfo>> SetReportState(ReportQueryInfo model)
         {
             var result = new ResponseModel<ReportQueryInfo>();
             var postData = new DbModel<ReportQueryInfo>(){ Item = model };
@@ -95,7 +100,8 @@ namespace RAServices.Controllers
             return result;
         }
 
-        private async Task<ResponseModel<ReportQueryInfo>> UpdateReportState(ReportQueryInfo model)
+        [HttpPost]
+        public async Task<ResponseModel<ReportQueryInfo>> UpdateReportState(ReportQueryInfo model)
         {
             var result = new ResponseModel<ReportQueryInfo>();
             var postData = new DbModel<ReportQueryInfo>() { 
