@@ -6,12 +6,13 @@ namespace RAServices.DAL
     public class MongoRepository : IMongoRepository, IDisposable
     {
         private string connectionString;
-        private string dbName = "RaAssessment";
+        private string dbName;
         private string collectionName;
 
-        public MongoRepository(string _connectionString, string _collectionName)
+        public MongoRepository(string _connectionString, string _dbName, string _collectionName)
         {
             this.connectionString = _connectionString;
+            this.dbName = _dbName;
             this.collectionName = _collectionName;
         }
 

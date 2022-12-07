@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RaModels;
 using RAServices.DAL;
 using RAServices.Model;
+using System.Xml.Linq;
 
 namespace RAServices.Controllers
 {
@@ -12,13 +13,15 @@ namespace RAServices.Controllers
     public class PersonsController : ControllerBase
     {
         private readonly IConfiguration configuration;
-        private string? connectionString;              
+        private string? connectionString;
+        private string? dbName;
         private MongoRepository _mongoRepository ;
         public PersonsController(IConfiguration configuration)
         {
             this.configuration = configuration;
             connectionString = configuration.GetConnectionString("MongoDb");
-            _mongoRepository = new MongoRepository(connectionString, "Person");
+            dbName = configuration.GetValue<string>("DbName");
+            _mongoRepository = new MongoRepository(connectionString, dbName, "Person");
         }
         [HttpPost]
         public async Task<ResponseModel<Person>> GetOne(RequestModel<Person> person)
