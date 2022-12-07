@@ -13,6 +13,6 @@ namespace RaModels
         public string ErrorMsg { get; set; }
         public List<T> ItemList { get; set; }
         public T Item { get; set; }
-        public int TotalRowCount { get; set; }
+        public long TotalRowCount { get; set; }
     }
 }
