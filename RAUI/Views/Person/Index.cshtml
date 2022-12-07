@@ -1,0 +1,248 @@
+﻿<link href="~/datatable/datatables.min.css" rel="stylesheet" />
+<link href="~/datatable/bootstrap-5-5.1.3/css/bootstrap.min.css" rel="stylesheet" />
+<link href="~/datatable/datatables-1.13.1/css/datatables.bootstrap5.min.css" rel="stylesheet" />
+<script src="~/datatable/datatables.min.js"></script>
+<script src="~/datatable/bootstrap-5-5.1.3/js/bootstrap.bundle.min.js"></script>
+<script src="~/datatable/datatables-1.13.1/js/datatables.bootstrap5.min.js"></script>
+<style>
+    .listtable {
+        font-size: 0.700rem;
+        border: 1px !important;
+        border-width: 2px 0 0 0 !important;
+        border-color: #e3e3e3 !important;
+    }
+
+    table.dataTable {
+        font-size: 0.700rem;
+    }
+
+    .truncate {
+        max-width: 50px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+</style>
+@{
+}
+<div class="container container-fluid">
+    <div class="row">
+        <div class="col">
+            <div class="card-header">Ürünler</div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <table id="tblProductList" class="table table-bordered stripe table-condensed listtable">
+                <tr>
+                    <th class="text-center ">Görsel</th>
+                    <th>Stok Kodu</th>
+                    <th>Stok Adı</th>
+                    <th>Stok Tipi</th>
+                    <th>Stok Miktarı</th>
+                    <th>Birim</th>
+                    <th>Liste Fiyatı</th>
+                    <th>Para Birimi</th>
+                    <th>İskontolu Fiyat</th>
+                    <th>İşlem</th>
+                </tr>
+
+            </table>
+        </div>
+    </div>
+</div>
+<!-- Modal -->
+<div class="modal fade" id="mdlProductDetail" tabindex="-1" aria-labelledby="mdlProductDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdlProductDetailLabel">Stok Detay</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    @Html.Hidden("SelectedRowId")
+                    <div class="form-floating mb-2">
+                        <input type="text" id="StockName" class="form-control form-control-sm" placeholder="Stok Adı">
+                        <label for="floatingInput">Stok Adı</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="StockCode" class="form-control form-control-sm" placeholder="Stok Kodu">
+                        <label for="floatingInput">Stok Kodu</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="StockType" class="form-control form-control-sm" placeholder="Stok Tipi">
+                        <label for="floatingInput">Stok Tipi</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="ListPrice" class="form-control form-control-sm" placeholder="Liste Fiyatı">
+                        <label for="floatingInput">Liste Fiyatı</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="ListPriceVat" class="form-control form-control-sm" placeholder="Liste Fiyatı KDV">
+                        <label for="floatingInput">Liste Fiyatı KDV</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="Price" class="form-control form-control-sm" placeholder="Fiyatı">
+                        <label for="floatingInput">Fiyatı</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="PriceVat" class="form-control form-control-sm" placeholder="Liste Fiyatı KDV">
+                        <label for="floatingInput">Liste Fiyatı KDV</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="Currency" class="form-control form-control-sm" placeholder="Para Birimi">
+                        <label for="floatingInput">Para Birimi</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="Stock" class="form-control form-control-sm" placeholder="Stok Miktarı">
+                        <label for="floatingInput">Miktarı</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="MaxSaleUnit" class="form-control form-control-sm" placeholder="En Fazla Satılabilir Miktar">
+                        <label for="floatingInput">En Fazla Satılabilir Miktar</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="MinSaleUnit" class="form-control form-control-sm" placeholder="En Az Satılabilir Miktar">
+                        <label for="floatingInput">En Az Satılabilir Miktar</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="Kdv" class="form-control form-control-sm" placeholder="KDV Oranı">
+                        <label for="floatingInput">KDV Oranı</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="DiscountRate" class="form-control form-control-sm" placeholder="İskonto Oranı">
+                        <label for="floatingInput">İskonto Oranı</label>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sml" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary btn-sml">Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    var tblProductList = $('#tblProductList').DataTable({
+        //searching: false,
+        select: true,
+        processing: true,
+        scrollY: "50vh",
+        scrollCollapse: true,
+        scrollX: true,
+        paging: false,
+        ordering: true,
+        dom: "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4'><'col-sm-12 col-md-4'>>" +
+            "<'row'<'col-sm-12'tr>>" +
+            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+        columnDefs: [{ targets: [1, 2], className: "truncate" }],
+        fnCreatedRow: function (nRow, aData, iDataIndex) {
+            $(nRow).attr('id', aData["Id"]);
+            $(nRow).find(".truncate").each(function () {
+                $(this).attr("title", this.innerText);
+            });
+        },
+        language: {
+            url: "/datatable/i18n/tr.json"
+        },
+        ordering: true,
+        order: [[2, "desc"]],
+
+        ajax: {
+            url: "/Product/ProductTableData",
+            method: "POST",
+            data: { type: '@ViewContext.RouteData.Values["Id"]' }
+        },
+        columns: [
+            { data: 'Id', title: "Kayıt No", orderable: false, visible: false, name: 'Id' },
+            {
+                data: 'ProdImages',
+                title: "Görsel",
+                orderable: false,
+                name: 'ProdImages',
+                "render": function (data, type, row, meta) {
+                    return '<img src="' + data + '" width="50px">';
+                }
+            },
+            { data: 'StockCode', title: "Stok Kodu", name: 'StockCode' },
+            { data: 'Name', title: "Stok Adı", name: 'Name' },
+            { data: 'StockType', title: "Stok Tipi", name: 'StockType' },
+            { data: 'Stock', title: "Stok Miktarı", name: 'Stock' },
+            { data: 'ListPrice', title: "Liste Fiyatı", name: 'ListPrice' },
+            { data: 'ListPriceVat', title: "Liste Fiyatı KDV'li", name: 'LiListPriceVatstPrice' },
+            { data: 'Currency', title: "Para Birimi", name: 'Currency' },
+            { data: 'DiscountRate', title: "İskontolu Fiyat", name: 'DiscountRate' },
+            {
+                data: 'UnitIncrement',
+                title: "Artış Miktarı",
+                name: 'QuantityAdd',
+                render: function (data, type, row, meta) {
+                    var rowValue = '';
+                    if (data != null && data != undefined && data != '') {
+                        rowValue = data;
+                    }
+
+                    htmlStr = `<div class="input-group ">
+                                          <span class="input-group-text decrease" data-id="`+ row.Id + `">-</span>
+                                          <input type="text" class="form-control form-control-sm" id="UnitIncrement_`+ row.Id + `" style="width:50px;" aria-label="Artış Miktarı" value="1">
+                                          <span class="input-group-text increase" data-id="`+ row.Id + `">+</span>
+                                </div>`;
+
+                    return htmlStr;
+                }
+            },
+            {
+                data: "Id",
+                title: "İşlem",
+                name: "Id",
+                render: function (data, type, row, meta) {
+                    var rowValue = '';
+                    if (data != null && data != undefined && data != '') {
+                        rowValue = data;
+                    }
+
+                    if (rowValue)
+                        htmlStr = "<button class='btn btn-outline-info btn-sm btnDetail' type='button' id='btnDetail_" + rowValue + "' data-id='" + rowValue + "' >Detay</a>";
+
+                    return htmlStr;
+                }
+
+            },
+        ]
+
+    });
+
+    $('#tblProductList').delegate('.btnDetail', 'click', function () {
+        var recordId = $(this).data('id');
+        var tableData = tblProductList.rows().data();
+        var selectedRow = $.grep(tableData, function (e) { return e.Id == recordId });
+        $('#SelectedRowId').val(recordId);
+        $('#StockName').val(selectedRow[0].Name);
+        $('#StockCode').val(selectedRow[0].StockCode);
+        $('#StockType').val(selectedRow[0].StockType);
+        $('#ListPrice').val(selectedRow[0].ListPrice);
+        $('#ListPriceVat').val(selectedRow[0].ListPriceVat);
+        $('#Price').val(selectedRow[0].Price);
+        $('#PriceVat').val(selectedRow[0].PriceVat);
+        $('#Currency').val(selectedRow[0].Currency);
+        $('#MaxSaleUnit').val(selectedRow[0].MaxSaleUnit);
+        $('#MinSaleUnit').val(selectedRow[0].MinSaleUnit);
+        $('#Kdv').val(selectedRow[0].Kdv);
+        $('#DiscountRate').val(selectedRow[0].DiscountRate);
+        $('#Stock').val(selectedRow[0].Stock);
+        $('#mdlProductDetail').modal('show');
+    });
+    $('#tblProductList').delegate('.increase', 'click', function () {
+        var recordId = $(this).data('id');
+        var unitIncrement = $('#UnitIncrement_' + recordId);
+        unitIncrement.val(parseInt(unitIncrement.val()) + 1);
+    });
+    $('#tblProductList').delegate('.decrease', 'click', function () {
+        var recordId = $(this).data('id');
+        var unitIncrement = $('#UnitIncrement_' + recordId);
+        unitIncrement.val(parseInt(unitIncrement.val()) - 1);
+    });
+
+</script>

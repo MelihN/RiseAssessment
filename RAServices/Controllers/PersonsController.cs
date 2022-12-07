@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using RaModels;
 using RAServices.DAL;
 using RAServices.Model;
+using System.Xml.Linq;
 
 namespace RAServices.Controllers
 {
@@ -13,29 +14,27 @@ namespace RAServices.Controllers
     {
         private readonly IConfiguration configuration;
         private string? connectionString;
-        private string dbName = "RaAssessment";
-        private string collectionName = "Persons";        
-        private MongoDbAccess _mongoDbAccess = new MongoDbAccess();
+        private string? dbName;
+        private MongoRepository _mongoRepository ;
         public PersonsController(IConfiguration configuration)
         {
             this.configuration = configuration;
             connectionString = configuration.GetConnectionString("MongoDb");
+            dbName = configuration.GetValue<string>("DbName");
+            _mongoRepository = new MongoRepository(connectionString, dbName, "Person");
         }
         [HttpPost]
-        public ResponseModel<Person> GetOne(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> GetOne(RequestModel<Person> person)
         {
             var result = new ResponseModel<Person>();
 
             var postData = new DbModel<Person>()
             {
-                CollectionName = collectionName,
-                ConnectionString = connectionString,
-                DbName = dbName,
                 Item = person.Item,
                 RecordID = person.RecordId
             };
 
-            var data = _mongoDbAccess.GetFindOne<Person>(postData);
+            var data = await _mongoRepository.GetFindOne<Person>(postData);
             result.Item = data.Item;
             result.RequestState = data.State;
             result.TotalRowCount = data.TotalRowCount;
@@ -46,25 +45,20 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public ResponseModel<Person> GetList(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> GetList(RequestModel<Person> person)
         {
             var result = new ResponseModel<Person>();
             var postData = new DbModel<Person>()
             {
-                CollectionName = collectionName,
-                ConnectionString = connectionString,
-                DbName = dbName,
                 Item = person.Item,
                 RecordID = person.RecordId,
                 PagingStart = person.PagingStart,
                 PagingLength = person.PagingLength
-
             };
 
-            var data = _mongoDbAccess.GetDataList<Person>(postData);
+            var data = await _mongoRepository.GetDataList<Person>(postData);
             result.ItemList = data.ResultList;
             result.RequestState = data.State;
-
             result.TotalRowCount = data.TotalRowCount;
             result.ErrorMsg = data.ErrorMsg;
             result.RequestState = data.State;
@@ -73,20 +67,16 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public ResponseModel<Person> Create(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> Create(RequestModel<Person> person)
         {
             var result = new ResponseModel<Person>();
-
             var postData = new DbModel<Person>()
             {
-                CollectionName = collectionName,
-                ConnectionString = connectionString,
-                DbName = dbName,
                 Item = person.Item,
                 RecordID = person.RecordId
             };
 
-            var data = _mongoDbAccess.InsertData<Person>(postData);
+            var data = await _mongoRepository.InsertData<Person>(postData);
             
             result.Item = data.Item;
             result.ErrorMsg = data.ErrorMsg;
@@ -97,18 +87,15 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public ResponseModel<Person> Update(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> Update(RequestModel<Person> person)
         {
             var result = new ResponseModel<Person>();
             var postData = new DbModel<Person>()
             {
-                CollectionName = collectionName,
-                ConnectionString = connectionString,
-                DbName = dbName,
                 Item = person.Item,
                 RecordID = person.RecordId
             };
-            var data = _mongoDbAccess.UpdateData<Person>(postData);
+            var data = await _mongoRepository.UpdateData<Person>(postData);
             result.Item = data.Item;
             result.ErrorMsg = data.ErrorMsg;
             result.RequestState = data.State;
@@ -118,18 +105,15 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public ResponseModel<Person> Delete(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> Delete(RequestModel<Person> person)
         {
             var result = new ResponseModel<Person>();
             var postData = new DbModel<Person>()
             {
-                CollectionName = collectionName,
-                ConnectionString = connectionString,
-                DbName = dbName,
                 Item = person.Item,
                 RecordID = person.RecordId
             };
-            var data = _mongoDbAccess.DeleteData<Person>(postData);
+            var data = await _mongoRepository.DeleteData<Person>(postData);
             result.Item = null;
             result.ErrorMsg = data.ErrorMsg;
             result.RequestState = data.State;
