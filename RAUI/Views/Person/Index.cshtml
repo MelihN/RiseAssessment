@@ -23,180 +23,251 @@
         text-overflow: ellipsis;
     }
 
+    .dataTables_wrapper {
+        font-size: 0.700rem !important;
+    }
+
+    .tooltip1 {
+        position: relative;
+        display: inline-block;
+        border-bottom: 1px dotted black;
+    }
+
+        .tooltip1 .tooltiptext1 {
+            visibility: hidden;
+            min-width: 300px;
+            background-color: #555;
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 5px 0;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -60px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+            .tooltip1 .tooltiptext1::after {
+                content: "";
+                position: absolute;
+                top: 100%;
+                left: 50%;
+                margin-left: -5px;
+                border-width: 5px;
+                border-style: solid;
+                border-color: #555 transparent transparent transparent;
+            }
+
+        .tooltip1:hover .tooltiptext1 {
+            visibility: visible;
+            opacity: 1;
+        }
 </style>
 @{
 }
 <div class="container container-fluid">
     <div class="row">
         <div class="col">
-            <div class="card-header">Ürünler</div>
+            <div class="card-header">Kişiler</div>
         </div>
     </div>
     <div class="row">
         <div class="col">
-            <table id="tblProductList" class="table table-bordered stripe table-condensed listtable">
-                <tr>
-                    <th class="text-center ">Görsel</th>
-                    <th>Stok Kodu</th>
-                    <th>Stok Adı</th>
-                    <th>Stok Tipi</th>
-                    <th>Stok Miktarı</th>
-                    <th>Birim</th>
-                    <th>Liste Fiyatı</th>
-                    <th>Para Birimi</th>
-                    <th>İskontolu Fiyat</th>
-                    <th>İşlem</th>
-                </tr>
+            <div class="row">
+                <div class="col w-100">
+                    
+                </div>
+            </div>
+            <div class="row">
+                <div class="col">
+                    <table id="tblPersonList" class="table table-striped listtable">
+                        <tr>
+                            <th></th>
+                            <th>Adı</th>
+                            <th>Soyadı</th>
+                            <th>Firma</th>
+                            <th>İletişim Bilgisi</th>
+                            <th>İşlem</th>
+                        </tr>
 
-            </table>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<!-- Modal -->
-<div class="modal fade" id="mdlProductDetail" tabindex="-1" aria-labelledby="mdlProductDetailLabel" aria-hidden="true">
+<!-- Modal 1 -->
+<div class="modal fade" id="mdlPersonDetail" tabindex="-1" aria-labelledby="mdlPersonDetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="mdlProductDetailLabel">Stok Detay</h5>
+                <h5 class="modal-title" id="mdlPersonDetailLabel">Kişi Detay</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="container-fluid">
-                    @Html.Hidden("SelectedRowId")
+                    @Html.Hidden("UUID")
                     <div class="form-floating mb-2">
-                        <input type="text" id="StockName" class="form-control form-control-sm" placeholder="Stok Adı">
-                        <label for="floatingInput">Stok Adı</label>
+                        <input type="text" id="Name" class="form-control form-control-sm" placeholder="Adı">
+                        <label for="floatingInput">Adı</label>
                     </div>
                     <div class="form-floating mb-2">
-                        <input type="text" id="StockCode" class="form-control form-control-sm" placeholder="Stok Kodu">
-                        <label for="floatingInput">Stok Kodu</label>
+                        <input type="text" id="Surname" class="form-control form-control-sm" placeholder="Soyadı">
+                        <label for="floatingInput">Soyadı</label>
                     </div>
                     <div class="form-floating mb-2">
-                        <input type="text" id="StockType" class="form-control form-control-sm" placeholder="Stok Tipi">
-                        <label for="floatingInput">Stok Tipi</label>
+                        <input type="text" id="CompanyName" class="form-control form-control-sm" placeholder="Firma Adı">
+                        <label for="floatingInput">Firma Adı</label>
                     </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="ListPrice" class="form-control form-control-sm" placeholder="Liste Fiyatı">
-                        <label for="floatingInput">Liste Fiyatı</label>
-                    </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="ListPriceVat" class="form-control form-control-sm" placeholder="Liste Fiyatı KDV">
-                        <label for="floatingInput">Liste Fiyatı KDV</label>
-                    </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="Price" class="form-control form-control-sm" placeholder="Fiyatı">
-                        <label for="floatingInput">Fiyatı</label>
-                    </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="PriceVat" class="form-control form-control-sm" placeholder="Liste Fiyatı KDV">
-                        <label for="floatingInput">Liste Fiyatı KDV</label>
-                    </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="Currency" class="form-control form-control-sm" placeholder="Para Birimi">
-                        <label for="floatingInput">Para Birimi</label>
-                    </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="Stock" class="form-control form-control-sm" placeholder="Stok Miktarı">
-                        <label for="floatingInput">Miktarı</label>
-                    </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="MaxSaleUnit" class="form-control form-control-sm" placeholder="En Fazla Satılabilir Miktar">
-                        <label for="floatingInput">En Fazla Satılabilir Miktar</label>
-                    </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="MinSaleUnit" class="form-control form-control-sm" placeholder="En Az Satılabilir Miktar">
-                        <label for="floatingInput">En Az Satılabilir Miktar</label>
-                    </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="Kdv" class="form-control form-control-sm" placeholder="KDV Oranı">
-                        <label for="floatingInput">KDV Oranı</label>
-                    </div>
-                    <div class="form-floating mb-2">
-                        <input type="text" id="DiscountRate" class="form-control form-control-sm" placeholder="İskonto Oranı">
-                        <label for="floatingInput">İskonto Oranı</label>
+                    <div class="row">
+                        <div class="col">
+                            <table id="tblContactInfoView" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Telefon No</th>
+                                        <th>E-Posta</th>
+                                        <th>Lokasyon</th>                                        
+                                    </tr>
+                                </thead>
+
+                            </table>
+                        </div>
                     </div>
                 </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sml" data-bs-dismiss="modal">Kapat</button>
-                <button type="button" class="btn btn-primary btn-sml">Kaydet</button>
+                <button type="button" class="btn btn-primary btn-sml"><i class="fa fa-save"></i> Kaydet</button>
             </div>
         </div>
     </div>
 </div>
+<!-- Modal 2 -->
+<div class="modal fade" id="mdlContactInfo" tabindex="-1" aria-labelledby="mdlProductDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdlProductDetailLabel">Kişi İletişim Bilgisi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col">
+                            Adı
+                        </div>                        
+                        <div class="col">
+                            Soyadı
+                        </div>                        
+                        <div class="col">
+                            Firma Adı
+                        </div>                        
+                    </div>
+                    <div class="row">                        
+                        <div class="col">
+                            <span class="fw-bold" id="spnName"></span>
+                        </div>                        
+                        <div class="col">
+                            <span class="fw-bold" id="spnSurname"></span>
+                        </div>                        
+                        <div class="col">
+                            <span class="fw-bold" id="spnCompanyName"></span>
+                        </div>
+                    </div>
+                    
+                    @Html.Hidden("ContactUUID")
+                    <div class="form-floating mb-2">
+                        <input type="tel" id="PhoneNumber" class="form-control form-control-sm" placeholder="Telefon No">
+                        <label for="floatingInput">Telefon No</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="email" id="Email" class="form-control form-control-sm" placeholder="E-Posta">
+                        <label for="floatingInput">E-Posta</label>
+                    </div>
+                    <div class="form-floating mb-2">
+                        <input type="text" id="Location" class="form-control form-control-sm" placeholder="Lokasyon">
+                        <label for="floatingInput">Lokasyon</label>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <table id="tblContactInfoEdit" class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Telefon No</th>
+                                        <th>E-Posta</th>
+                                        <th>Lokasyon</th>
+                                        <th>İşlem</th>
+                                    </tr>
+                                </thead>
+                                
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary btn-sml" data-bs-dismiss="modal">Kapat</button>
+                <button type="button" class="btn btn-primary btn-sml"><i class="fa fa-save"></i> Kaydet</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    var tblProductList = $('#tblProductList').DataTable({
-        //searching: false,
-        select: true,
-        processing: true,
-        scrollY: "50vh",
-        scrollCollapse: true,
-        scrollX: true,
-        paging: false,
-        ordering: true,
-        dom: "<'row'<'col-sm-12 col-md-4'l><'col-sm-12 col-md-4'><'col-sm-12 col-md-4'>>" +
-            "<'row'<'col-sm-12'tr>>" +
-            "<'row'<'col-sm-12 col-md-5'i><'col-sm-12 col-md-7'p>>",
+    var tblPersonList = $('#tblPersonList').DataTable({
+        select: true,        
+        paging: true,
+        ordering: true,        
         columnDefs: [{ targets: [1, 2], className: "truncate" }],
         fnCreatedRow: function (nRow, aData, iDataIndex) {
-            $(nRow).attr('id', aData["Id"]);
+            $(nRow).attr('id', aData["UUID"]);
             $(nRow).find(".truncate").each(function () {
                 $(this).attr("title", this.innerText);
             });
         },
         language: {
             url: "/datatable/i18n/tr.json"
-        },
-        ordering: true,
+        },        
         order: [[2, "desc"]],
 
         ajax: {
-            url: "/Product/ProductTableData",
+            url: "/Person/PersonDtoData",
             method: "POST",
-            data: { type: '@ViewContext.RouteData.Values["Id"]' }
+            data: {}
         },
         columns: [
-            { data: 'Id', title: "Kayıt No", orderable: false, visible: false, name: 'Id' },
+            { data: 'UUID', title: "Kayıt No", orderable: false, visible: false, name: 'UUID' },
+            { data: 'Name', title: "Adı", name: 'Name', width: "20%" },
+            { data: 'Surname', title: "Soyadı", name: 'Surname', width: "20%" },
+            { data: 'CompanyName', title: "Firma", name: 'CompanyName', width: "20%" },
             {
-                data: 'ProdImages',
-                title: "Görsel",
-                orderable: false,
-                name: 'ProdImages',
-                "render": function (data, type, row, meta) {
-                    return '<img src="' + data + '" width="50px">';
-                }
-            },
-            { data: 'StockCode', title: "Stok Kodu", name: 'StockCode' },
-            { data: 'Name', title: "Stok Adı", name: 'Name' },
-            { data: 'StockType', title: "Stok Tipi", name: 'StockType' },
-            { data: 'Stock', title: "Stok Miktarı", name: 'Stock' },
-            { data: 'ListPrice', title: "Liste Fiyatı", name: 'ListPrice' },
-            { data: 'ListPriceVat', title: "Liste Fiyatı KDV'li", name: 'LiListPriceVatstPrice' },
-            { data: 'Currency', title: "Para Birimi", name: 'Currency' },
-            { data: 'DiscountRate', title: "İskontolu Fiyat", name: 'DiscountRate' },
-            {
-                data: 'UnitIncrement',
-                title: "Artış Miktarı",
-                name: 'QuantityAdd',
+                data: 'ContactInfos',
+                title: "İletişim Bilgileri",
+                name: 'ContactInfos',
+                width: "15%",
                 render: function (data, type, row, meta) {
                     var rowValue = '';
                     if (data != null && data != undefined && data != '') {
                         rowValue = data;
                     }
-
-                    htmlStr = `<div class="input-group ">
-                                          <span class="input-group-text decrease" data-id="`+ row.Id + `">-</span>
-                                          <input type="text" class="form-control form-control-sm" id="UnitIncrement_`+ row.Id + `" style="width:50px;" aria-label="Artış Miktarı" value="1">
-                                          <span class="input-group-text increase" data-id="`+ row.Id + `">+</span>
-                                </div>`;
+                    let titleHtml = `<div class='tooltiptext1'><div class='row bold'><div class='col'>Telefon No</div><div class='col'>E-Posta</div><div class='col'>Lokasyon</div></div>`;
+                    $.each(rowValue, function (idx, val) {
+                        titleHtml += `<div class='row'><div class='col'>` + val.PhoneNumber + `</div><div class='col'>` + val.Email + `</div><div class='col'>` + val.Location + `</div></div>`;
+                    });
+                    titleHtml += '</div>';
+                    htmlStr = `<div class="tooltip1" >` + rowValue.length + ` iletişim bilgisi mevcut.` + titleHtml + `</div>`;
 
                     return htmlStr;
                 }
             },
             {
-                data: "Id",
+                data: "UUID",
                 title: "İşlem",
-                name: "Id",
+                name: "UUID",
+                width:"25%",
                 render: function (data, type, row, meta) {
                     var rowValue = '';
                     if (data != null && data != undefined && data != '') {
@@ -204,45 +275,119 @@
                     }
 
                     if (rowValue)
-                        htmlStr = "<button class='btn btn-outline-info btn-sm btnDetail' type='button' id='btnDetail_" + rowValue + "' data-id='" + rowValue + "' >Detay</a>";
+                        htmlStr = `<div class="btn-group btn-group-sm" role="group" aria-label="tblAccessButtons">
+                            <button class='btn btn-sm btn-outline-info btnAddContact' type='button' id='btnAddContact_` + rowValue + `' data-id='` + rowValue + `' ><i class='fa fa-address-book '></i> İletişim Bilgisi Düzenle</button>
+                                        <button class='btn btn-sm btn-outline-warning btnDetail' type='button' id='btnDetail_` + rowValue + `' data-id="` + rowValue + `"><i class='fa fa-search'></i> Düzenle</button>
+                                        <button class='btn btn-sm btn-outline-danger btnDelete' type='button' id='btnDelete_` + rowValue + `' data-id='` + rowValue + `' ><i class='fa fa-trash'></i> Sil</button>                                                
+                                        </div>`;
 
                     return htmlStr;
                 }
 
             },
+        ],
+        "initComplete": function (oSettings) {
+            $('#tblPersonList_filter').append(`<button class="btn btn-sm btn-outline-success m-1 align-self-end " id="btnAddPerson"><i class="fa fa-plus"></i> Ekle</button>`);
+        }
+
+    });
+    
+    $('#tblPersonList').delegate('.btnDetail', 'click', function () {        
+        var recordId = $(this).data('id');
+        var tableData = tblPersonList.rows().data();
+        var selectedRow = $.grep(tableData, function (e) { return e.UUID == recordId });
+        $('#UUID').val(recordId);
+        $('#Name').val(selectedRow[0].Name);
+        $('#Surname').val(selectedRow[0].Surname);
+        $('#CompanyName').val(selectedRow[0].CompanyName);
+        RefreshDataTable('#tblContactInfoView', selectedRow[0].ContactInfos);
+        $('#mdlPersonDetail').modal('show');
+    });
+
+    $('.container').delegate('#btnAddPerson','click',function(){        
+        $('#UUID').val('');
+        $('#Name').val('');
+        $('#Surname').val('');
+        $('#CompanyName').val('');
+        $('#mdlPersonDetail').modal('show');
+    });
+
+    var contactInfoView = $('#tblContactInfoView').DataTable({
+        select: true,
+        paging: false,
+        ordering: true,
+        order: [[0, "desc"]],
+        searching: false,
+        columns: [
+            { data: 'PhoneNumber', title: "Telefon No", name: 'PhoneNumber' },
+            { data: 'Email', title: "E-Posta", name: 'Email' },
+            { data: 'Location', title: "Lokasyon", name: 'Location' }            
         ]
+    });
+        
+    var contactTable = $('#tblContactInfoEdit').DataTable({
+            select: true,
+            paging: false,
+            ordering: true,
+            order: [[0, "desc"]],
+            searching: false,
+            columns: [                
+                { data: 'PhoneNumber', title: "Telefon No", name: 'PhoneNumber'},
+                { data: 'Email', title: "E-Posta", name: 'Email'},
+                { data: 'Location', title: "Lokasyon", name: 'Location'},
+                {
+                    data: "PhoneNumber",
+                    title: "İşlem",
+                name: "PhoneNumber",
+                render: function (data, type, row, meta) {
+                        var rowValue = '';
+                        if (data != null && data != undefined && data != '') {
+                            rowValue = data;
+                        }
 
+                        if (rowValue)
+                        htmlStr = `<button class='btn btn-sm btn-outline-warning btnEditContact' type='button' id='btnEditContact_` + rowValue + `' data-id='` + rowValue + `' data-phonenumber='` + row.PhoneNumber + `' data-email='` + row.Email + `' data-location='` + row.Location + `'><i class='fa fa-address-book '></i>Seç</button>`;
+
+                        return htmlStr;
+                    }
+                }
+            ]
+        });
+    
+
+    $('#tblPersonList').delegate('.btnAddContact', 'click', function () {
+        
+        var recordId = $(this).data('id');
+        var tableData = tblPersonList.rows().data();
+        var selectedRow = $.grep(tableData, function (e) { return e.UUID == recordId });
+        $('#PhoneNumber').val('');
+        $('#Email').val('');
+        $('#Location').val('');
+        $('#ContactUUID').val(recordId);
+        $('#spnName').empty().append(selectedRow[0].Name);
+        $('#spnSurname').empty().append(selectedRow[0].Surname);
+        $('#spnCompanyName').empty().append(selectedRow[0].CompanyName);
+        RefreshDataTable('#tblContactInfoEdit',selectedRow[0].ContactInfos);
+        $('#mdlContactInfo').modal('show');
     });
 
-    $('#tblProductList').delegate('.btnDetail', 'click', function () {
-        var recordId = $(this).data('id');
-        var tableData = tblProductList.rows().data();
-        var selectedRow = $.grep(tableData, function (e) { return e.Id == recordId });
-        $('#SelectedRowId').val(recordId);
-        $('#StockName').val(selectedRow[0].Name);
-        $('#StockCode').val(selectedRow[0].StockCode);
-        $('#StockType').val(selectedRow[0].StockType);
-        $('#ListPrice').val(selectedRow[0].ListPrice);
-        $('#ListPriceVat').val(selectedRow[0].ListPriceVat);
-        $('#Price').val(selectedRow[0].Price);
-        $('#PriceVat').val(selectedRow[0].PriceVat);
-        $('#Currency').val(selectedRow[0].Currency);
-        $('#MaxSaleUnit').val(selectedRow[0].MaxSaleUnit);
-        $('#MinSaleUnit').val(selectedRow[0].MinSaleUnit);
-        $('#Kdv').val(selectedRow[0].Kdv);
-        $('#DiscountRate').val(selectedRow[0].DiscountRate);
-        $('#Stock').val(selectedRow[0].Stock);
-        $('#mdlProductDetail').modal('show');
+    $('#tblContactInfoEdit').delegate('.btnEditContact', 'click', function () {                
+        $('#PhoneNumber').val($(this).data('phonenumber'));
+        $('#Email').val($(this).data('email'));
+        $('#Location').val($(this).data('location'));        
     });
-    $('#tblProductList').delegate('.increase', 'click', function () {
-        var recordId = $(this).data('id');
-        var unitIncrement = $('#UnitIncrement_' + recordId);
-        unitIncrement.val(parseInt(unitIncrement.val()) + 1);
-    });
-    $('#tblProductList').delegate('.decrease', 'click', function () {
-        var recordId = $(this).data('id');
-        var unitIncrement = $('#UnitIncrement_' + recordId);
-        unitIncrement.val(parseInt(unitIncrement.val()) - 1);
-    });
+    
+    function RefreshDataTable(tableId, newData) {
+        var dt = $(tableId).dataTable();
+        oSettings = dt.fnSettings();
+        dt.fnClearTable(this);
 
+        for (var i = 0; i < newData.length; i++) {
+            dt.oApi._fnAddData(oSettings, newData[i]);
+        }
+
+        oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
+        dt.fnDraw();        
+        return true;
+    }
 </script>
