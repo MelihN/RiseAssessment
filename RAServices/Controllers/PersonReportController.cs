@@ -4,6 +4,7 @@ using RaModels;
 using RAServices.DAL;
 using RAServices.Model;
 using System;
+using System.Net.Http.Headers;
 
 namespace RAServices.Controllers
 {
@@ -28,14 +29,13 @@ namespace RAServices.Controllers
         {
             var result = new ResponseModel<PersonReport>();
             var postData = new DbModel<Person>();
-            
-            var mongoRepo = new MongoRepository(connectionString, dbName, "Person");
-            var data = await mongoRepo.GetDataList<Person>(postData);
+                        
+            var data = await GetPersonList(new RequestModel<Person>());
 
-            if (data.State)
+            if (data.RequestState)
             {
                 var reportList = new List<PersonReport>();
-                foreach (var person in data.ResultList)
+                foreach (var person in data.ItemList)
                 {
                     if (person.ContactInfos != null && person.ContactInfos.Count > 0)
                     {
@@ -59,64 +59,32 @@ namespace RAServices.Controllers
             else
                 result.ItemList = new List<PersonReport>();
 
-            result.RequestState = data.State;
+            result.RequestState = data.RequestState;
             result.TotalRowCount = data.TotalRowCount;
-            result.ErrorMsg = data.ErrorMsg;
-            result.RequestState = data.State;
+            result.ErrorMsg = data.ErrorMsg;            
             result.ServiceState = true;
 
             return result;
         }
 
-        [HttpPost]
-        public async Task<ResponseModel<ReportQueryInfo>> GetReportState(ReportQueryInfo model)
+        private async Task<ResponseModel<Person>> GetPersonList(RequestModel<Person> person)
         {
-            var result = new ResponseModel<ReportQueryInfo>();
-            var postData = new DbModel<ReportQueryInfo>() { RecordID = model.UUID };
+            var client = new HttpClient();
+            client.BaseAddress = new Uri(HttpContext.Request.Host.Value);
+            client.Timeout = TimeSpan.FromMinutes(5);
+            byte[] cred = System.Text.UTF8Encoding.UTF8.GetBytes("RaTestUser:p@ssw0rdRa");
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(cred));
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));            
 
-            var data = await _mongoRepository.GetFindOne<ReportQueryInfo>(postData);
-
-            result.Item = data.Item;
-            result.ErrorMsg = data.ErrorMsg;
-            result.RequestState = data.State;
-            result.ServiceState = true;
-
-            return result;
-        }
-
-        [HttpPost]
-        public async Task<ResponseModel<ReportQueryInfo>> SetReportState(ReportQueryInfo model)
-        {
-            var result = new ResponseModel<ReportQueryInfo>();
-            var postData = new DbModel<ReportQueryInfo>(){ Item = model };
-
-            var data = await _mongoRepository.InsertData<ReportQueryInfo>(postData);
-
-            result.Item = data.Item;
-            result.ErrorMsg = data.ErrorMsg;
-            result.RequestState = data.State;
-            result.ServiceState = true;
-
-            return result;
-        }
-
-        [HttpPost]
-        public async Task<ResponseModel<ReportQueryInfo>> UpdateReportState(ReportQueryInfo model)
-        {
-            var result = new ResponseModel<ReportQueryInfo>();
-            var postData = new DbModel<ReportQueryInfo>() { 
-                Item = model, 
-                RecordID = model.UUID
-            };
-
-            var data = await _mongoRepository.UpdateData<ReportQueryInfo>(postData);
-
-            result.Item = data.Item;
-            result.ErrorMsg = data.ErrorMsg;
-            result.RequestState = data.State;
-            result.ServiceState = true;
-
-            return result;
+            using (HttpResponseMessage response = await client.PostAsJsonAsync("api/Person/GetList", person))
+            {
+                var result = new ResponseModel<Person>();
+                if (response.IsSuccessStatusCode)
+                {
+                    result = await response.Content.ReadFromJsonAsync<ResponseModel<Person>>();
+                }                
+                return result;
+            }
         }
     }
 }

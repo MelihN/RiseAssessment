@@ -10,7 +10,7 @@ namespace RAUI.ServiceHelper
         {
             var client = ServiceClient(baseUrl);
 
-            using (HttpResponseMessage response = await client.PostAsJsonAsync("Person/GetList", requestModel))
+            using (HttpResponseMessage response = await client.PostAsJsonAsync("api/Person/GetList", requestModel))
             {
                 var result = new ResponseModel<Person>();
                 if (response.IsSuccessStatusCode)
@@ -29,7 +29,7 @@ namespace RAUI.ServiceHelper
         {
             var client = ServiceClient(baseUrl);
 
-            using (HttpResponseMessage response = await client.PostAsJsonAsync("Person/GetOne", ReqMsg))
+            using (HttpResponseMessage response = await client.PostAsJsonAsync("api/Person/GetOne", ReqMsg))
             {
                 var result = new ResponseModel<Person>();
                 if (response.IsSuccessStatusCode)
@@ -48,7 +48,7 @@ namespace RAUI.ServiceHelper
         {
             var client = ServiceClient(baseUrl);
 
-            using (HttpResponseMessage response = await client.PostAsJsonAsync("Person/Create", ReqMsg))
+            using (HttpResponseMessage response = await client.PostAsJsonAsync("api/Person/Create", ReqMsg))
             {
                 var result = new ResponseModel<Person>();
                 if (response.IsSuccessStatusCode)
@@ -67,7 +67,7 @@ namespace RAUI.ServiceHelper
         {
             var client = ServiceClient(baseUrl);
 
-            using (HttpResponseMessage response = await client.PostAsJsonAsync("Person/Update", ReqMsg))
+            using (HttpResponseMessage response = await client.PostAsJsonAsync("api/Person/Update", ReqMsg))
             {
                 var result = new ResponseModel<Person>();
                 if (response.IsSuccessStatusCode)
@@ -86,7 +86,7 @@ namespace RAUI.ServiceHelper
         {
             var client = ServiceClient(baseUrl);
 
-            using (HttpResponseMessage response = await client.PostAsJsonAsync("Person/Delete", ReqMsg))
+            using (HttpResponseMessage response = await client.PostAsJsonAsync("api/Person/Delete", ReqMsg))
             {
                 var result = new ResponseModel<Person>();
                 if (response.IsSuccessStatusCode)
