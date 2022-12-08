@@ -8,7 +8,8 @@ builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddSingleton<IConfiguration>();
+//builder.Services.AddSingleton<IConfiguration>();
+var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
 
 var app = builder.Build();
 
@@ -16,7 +17,11 @@ var app = builder.Build();
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c =>
+    {
+        c.DefaultModelsExpandDepth(-1); // Disable swagger schemas at bottom
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Rise Assessment");
+    });
 }
 
 app.UseHttpsRedirection();
