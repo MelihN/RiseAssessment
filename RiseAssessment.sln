@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RAUI", "RAUI\RAUI.csproj", 
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RaModels", "RaModels\RaModels.csproj", "{066CA86C-34BA-418B-B3AE-73FAFEEB2C85}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAServicesTests", "RAServicesTests\RAServicesTests.csproj", "{59DCC720-1A4C-44AC-B3E1-60680A03CE2B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RAServicesTests", "RAServicesTests\RAServicesTests.csproj", "{59DCC720-1A4C-44AC-B3E1-60680A03CE2B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RAUITests", "RAUITests\RAUITests.csproj", "{BC2B4741-E579-4240-BB0C-AE9239DBB885}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{59DCC720-1A4C-44AC-B3E1-60680A03CE2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{59DCC720-1A4C-44AC-B3E1-60680A03CE2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{59DCC720-1A4C-44AC-B3E1-60680A03CE2B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BC2B4741-E579-4240-BB0C-AE9239DBB885}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BC2B4741-E579-4240-BB0C-AE9239DBB885}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BC2B4741-E579-4240-BB0C-AE9239DBB885}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BC2B4741-E579-4240-BB0C-AE9239DBB885}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

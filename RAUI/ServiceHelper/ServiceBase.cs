@@ -1,17 +1,19 @@
-﻿using System.Net.Http.Headers;
+﻿using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 
 namespace RAUI.ServiceHelper
 {
     public class ServiceBase
     {        
         public static HttpClient ServiceClient(string baseUrl)
-        {
+        {            
             var client = new HttpClient();
             client.BaseAddress = new Uri(baseUrl);
-            client.Timeout = TimeSpan.FromMinutes(5);
-            byte[] cred = System.Text.UTF8Encoding.UTF8.GetBytes("RaTestUser:p@ssw0rdRa");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(cred));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
+            client.Timeout = TimeSpan.FromMinutes(5);            
+            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));            
+            //client.DefaultRequestHeaders.Add("accept", "application/json; charset=utf-8");
+            
             return client;
         }
 

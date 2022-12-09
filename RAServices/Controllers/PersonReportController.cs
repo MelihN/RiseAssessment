@@ -1,9 +1,12 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using RaModels;
 using RAServices.DAL;
 using RAServices.Model;
 using System;
+using System.Net.Http;
 using System.Net.Http.Headers;
 
 namespace RAServices.Controllers
@@ -69,22 +72,17 @@ namespace RAServices.Controllers
 
         private async Task<ResponseModel<Person>> GetPersonList(RequestModel<Person> person)
         {
-            var client = new HttpClient();
-            client.BaseAddress = new Uri(HttpContext.Request.Host.Value);
-            client.Timeout = TimeSpan.FromMinutes(5);
-            byte[] cred = System.Text.UTF8Encoding.UTF8.GetBytes("RaTestUser:p@ssw0rdRa");
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", Convert.ToBase64String(cred));
-            client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));            
-
-            using (HttpResponseMessage response = await client.PostAsJsonAsync("api/Person/GetList", person))
-            {
-                var result = new ResponseModel<Person>();
-                if (response.IsSuccessStatusCode)
-                {
-                    result = await response.Content.ReadFromJsonAsync<ResponseModel<Person>>();
-                }                
-                return result;
-            }
+            var result = new ResponseModel<Person>();
+            MongoRepository repo1 = new MongoRepository(connectionString, dbName, "Person");
+            var postData = new DbModel<Person>();
+            var data = await repo1.GetDataList<Person>(postData);
+            result.ItemList = data.ResultList;
+            result.RequestState = data.State;
+            result.TotalRowCount = data.TotalRowCount;
+            result.ErrorMsg = data.ErrorMsg;
+            result.RequestState = data.State;
+            result.ServiceState = true;
+            return result;
         }
     }
 }
