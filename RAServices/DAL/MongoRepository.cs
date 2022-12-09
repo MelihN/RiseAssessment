@@ -1,26 +1,29 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Configuration;
 using RAServices.Model;
+using System.Xml.Linq;
 
 namespace RAServices.DAL
 {
     public class MongoRepository : IMongoRepository, IDisposable
     {
-        private string connectionString;
-        private string dbName;
+        //private string connectionString;
+        //private string dbName;
+        IMongoDatabase database;
         private string collectionName;
 
         public MongoRepository(string _connectionString, string _dbName, string _collectionName)
-        {
-            this.connectionString = _connectionString;
-            this.dbName = _dbName;
+        {            
+            MongoClient dbClient = new MongoClient(_connectionString);
+            database = dbClient.GetDatabase(_dbName);
             this.collectionName = _collectionName;
         }
 
         public async Task<DbModel<T>> GetFindOne<T>(DbModel<T> requestModel)
         {
             var result = new DbModel<T>();
-            MongoClient dbClient = new MongoClient(connectionString);
-            var database = dbClient.GetDatabase(dbName);
+            
             var collection = database.GetCollection<T>(collectionName);
 
             var resultData = default(T);
@@ -51,11 +54,9 @@ namespace RAServices.DAL
             return result;
         }
 
-        public async Task<DbModel<T>> GetDataList<T>(DbModel<T> requestModel)
+        public  async Task<DbModel<T>> GetDataList<T>(DbModel<T> requestModel)
         {
-            var result = new DbModel<T>();
-            MongoClient dbClient = new MongoClient(connectionString);
-            var database = dbClient.GetDatabase(dbName);
+            var result = new DbModel<T>();            
             var collection = database.GetCollection<T>(collectionName);
 
             var resultData = new List<T>();
@@ -63,7 +64,7 @@ namespace RAServices.DAL
             try
             {
                 var allDocument = collection.Find(_ => true);
-                result.TotalRowCount = allDocument.Count();
+                result.TotalRowCount = allDocument.ToList().Count;
 
                 if (requestModel.PagingStart >= 0 && requestModel.PagingLength > 0)
                 {
@@ -101,13 +102,11 @@ namespace RAServices.DAL
 
         public async Task<DbModel<T>> InsertData<T>(DbModel<T> request)
         {
-            var result = new DbModel<T>();
-            MongoClient dbClient = new MongoClient(connectionString);
-            var database = dbClient.GetDatabase(dbName);
+            var result = new DbModel<T>();            
             var collection = database.GetCollection<T>(collectionName);
             string jsonString = string.Empty;
             try
-            {
+            {                
                 var filterDef = Builders<T>.Filter.Eq("_id", request.RecordID);
                 var avilableT = await collection.Find<T>(filterDef).ToListAsync();
                 if (avilableT.Count <= 0)
@@ -148,17 +147,16 @@ namespace RAServices.DAL
 
         public async Task<DbModel<T>> UpdateData<T>(DbModel<T> requestModel)
         {
-            var result = new DbModel<T>();
-            MongoClient dbClient = new MongoClient(connectionString);
-            var database = dbClient.GetDatabase(dbName);
+            var result = new DbModel<T>();            
             var collection = database.GetCollection<T>(collectionName);
 
             try
             {
-                var filterDef = Builders<T>.Filter.Eq("_id", requestModel.RecordID);
-                var data = await collection.FindOneAndReplaceAsync<T>(filterDef, requestModel.Item);
+                ObjectId recordId = new ObjectId(requestModel.RecordID);
+                var filterDef = Builders<T>.Filter.Eq("_id", recordId);
+                var data = await collection.FindOneAndReplaceAsync<T>(filterDef,  requestModel.Item);
                 result.State = true;
-                result.Item = data;
+                result.Item = requestModel.Item;
 
             }
             catch (MongoException mex)
@@ -177,16 +175,15 @@ namespace RAServices.DAL
 
         public async Task<DbModel<T>> DeleteData<T>(DbModel<T> requestModel)
         {
-            var result = new DbModel<T>();
-            MongoClient dbClient = new MongoClient(connectionString);
-            var database = dbClient.GetDatabase(dbName);
+            var result = new DbModel<T>();            
             var collection = database.GetCollection<T>(collectionName);
 
             try
             {
-                var filterDef = Builders<T>.Filter.Eq("_id", requestModel.RecordID);
-                await collection.DeleteOneAsync(filterDef);
-                result.State = true;
+                ObjectId recordId = new ObjectId(requestModel.RecordID);
+                var filterDef = Builders<T>.Filter.Eq("_id", recordId);
+                var deleteAction = await collection.DeleteOneAsync(filterDef);
+                result.State = (deleteAction.DeletedCount == 1 ? true : false);
             }
             catch (MongoException mex)
             {

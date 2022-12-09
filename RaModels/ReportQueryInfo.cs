@@ -1,15 +1,28 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using MongoDB.Bson.Serialization.Attributes;
+using MongoDB.Bson;
 
 namespace RaModels
 {
     public class ReportQueryInfo
     {
-        public string UUID { get; set; }
-        public DateTime RequestDate { get; set; }
-        public string ReportState { get; set; }
+        private string? _bsonId;
+        
+        [BsonRepresentation(BsonType.ObjectId)]
+        public string Id
+        {
+            get { return this._bsonId; }
+            set
+            {
+                if (string.IsNullOrWhiteSpace(value))
+                {
+                    this._bsonId = new BsonObjectId(ObjectId.GenerateNewId()).ToString();
+                }
+                else
+                    this._bsonId = value;
+            }
+        }
+        public string UUID { get; set; } = string.Empty;
+        public DateTime? RequestDate { get; set; }
+        public string? ReportState { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace RAServices.Controllers
             this.configuration = configuration;
             connectionString = configuration.GetConnectionString("MongoDb");
             dbName = configuration.GetValue<string>("DbName");
-            _mongoRepository = new MongoRepository(connectionString, dbName, "PersonReport");
+            _mongoRepository = new MongoRepository(connectionString, dbName, "ReportState");
         }
         [HttpPost]
         public async Task<ResponseModel<ReportQueryInfo>> GetOne(ReportQueryInfo model)
@@ -44,7 +44,7 @@ namespace RAServices.Controllers
 
             var data = await _mongoRepository.GetDataList<ReportQueryInfo>(postData);
 
-            result.Item = data.Item;
+            result.ItemList = data.ResultList;
             result.ErrorMsg = data.ErrorMsg;
             result.RequestState = data.State;
             result.ServiceState = true;
@@ -53,10 +53,10 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public async Task<ResponseModel<ReportQueryInfo>> Create(ReportQueryInfo model)
+        public async Task<ResponseModel<ReportQueryInfo>> Create(RequestModel<ReportQueryInfo> requestModel)
         {
             var result = new ResponseModel<ReportQueryInfo>();
-            var postData = new DbModel<ReportQueryInfo>() { Item = model };
+            var postData = new DbModel<ReportQueryInfo>() { Item = requestModel.Item };
 
             var data = await _mongoRepository.InsertData<ReportQueryInfo>(postData);
 
@@ -69,18 +69,36 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public async Task<ResponseModel<ReportQueryInfo>> Update(ReportQueryInfo model)
+        public async Task<ResponseModel<ReportQueryInfo>> Update(RequestModel<ReportQueryInfo> requestModel)
         {
             var result = new ResponseModel<ReportQueryInfo>();
             var postData = new DbModel<ReportQueryInfo>()
             {
-                Item = model,
-                RecordID = model.UUID
+                Item = requestModel.Item,
+                RecordID = requestModel.RecordId
             };
 
             var data = await _mongoRepository.UpdateData<ReportQueryInfo>(postData);
 
             result.Item = data.Item;
+            result.ErrorMsg = data.ErrorMsg;
+            result.RequestState = data.State;
+            result.ServiceState = true;
+
+            return result;
+        }
+
+        [HttpPost]
+        public async Task<ResponseModel<ReportQueryInfo>> Delete(RequestModel<ReportQueryInfo> requestModel)
+        {
+            var result = new ResponseModel<ReportQueryInfo>();
+            var postData = new DbModel<ReportQueryInfo>()
+            {
+                Item = requestModel.Item,
+                RecordID = requestModel.RecordId
+            };
+            var data = await _mongoRepository.DeleteData<ReportQueryInfo>(postData);
+            result.Item = null;
             result.ErrorMsg = data.ErrorMsg;
             result.RequestState = data.State;
             result.ServiceState = true;
