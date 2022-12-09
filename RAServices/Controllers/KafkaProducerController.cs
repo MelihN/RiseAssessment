@@ -1,28 +1,39 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Confluent.Kafka;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver.Core.Configuration;
 using RaModels;
 using RAServices.DAL;
 using RAServices.Model;
+using System.Diagnostics;
+using System.Net;
+using System.Text.Json;
+using System.Xml.Linq;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace RAServices.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]")]
     [ApiController]
-    public class PersonReportController : ControllerBase
+    public class KafkaProducerController : ControllerBase
     {
         private readonly IConfiguration configuration;
         private string? connectionString;
         private string? dbName;
         private MongoRepository _mongoRepository;
-        public PersonReportController(IConfiguration configuration)
+        private readonly string bootstrapServers;
+        private readonly string topic = "PersonReport";
+        public KafkaProducerController(IConfiguration configuration)
         {
             this.configuration = configuration;
             connectionString = configuration.GetConnectionString("MongoDb");
             dbName = configuration.GetValue<string>("DbName");
-            _mongoRepository = new MongoRepository(connectionString, dbName, "PersonReport");
+            bootstrapServers = configuration.GetValue<string>("KafkaUrl");
+            _mongoRepository = new MongoRepository(connectionString, dbName, "personreport");
         }
 
         [HttpPost]
-        public async Task<ResponseModel<PersonReport>> GetReportData()
+        public async Task<IActionResult> Post([FromBody] RequestModel<PersonReport> personReport)
         {
             var result = new ResponseModel<PersonReport>();
             var postData = new DbModel<Person>();
@@ -67,7 +78,26 @@ namespace RAServices.Controllers
             result.ErrorMsg = data.ErrorMsg;
             result.ServiceState = true;
 
-            return result;
+            string message = JsonSerializer.Serialize(result);
+            return Created(string.Empty, SendToKafka(topic, message));
+        }
+        private async Task<DeliveryResult<string, string>> SendToKafka(string topic, string messageBody)
+        {
+            var config = new ProducerConfig() { BootstrapServers = bootstrapServers };
+
+            using (var producer = new ProducerBuilder<string,string>(config).Build())
+            {
+                try
+                {
+                    Message<string, string> message = new Message<string, string> { Value = messageBody };
+                    DeliveryResult<string, string> result = producer.ProduceAsync(topic, message).GetAwaiter().GetResult();
+                    return result;
+                }
+                catch(Exception ex)
+                {
+                    throw ex;
+                }   
+            }
         }
 
         private async Task<ResponseModel<Person>> GetPersonList(RequestModel<Person> person)
@@ -84,8 +114,5 @@ namespace RAServices.Controllers
             result.ServiceState = true;
             return result;
         }
-
-
-        
     }
 }
