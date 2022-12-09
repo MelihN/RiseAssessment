@@ -1,5 +1,8 @@
+using RAUI.ServiceHelper;
+
 var builder = WebApplication.CreateBuilder(args);
 
+//builder.Services.AddSingleton<IHostedService, KafkaConsumerService>();
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 var configuration = new ConfigurationBuilder().AddJsonFile("appsettings.json").Build();
