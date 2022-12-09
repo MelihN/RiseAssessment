@@ -20,3 +20,63 @@ html {
 body {
   margin-bottom: 60px;
 }
+.listtable {
+    font-size: 0.700rem;
+    border: 1px !important;
+    border-width: 2px 0 0 0 !important;
+    border-color: #e3e3e3 !important;
+}
+
+table.dataTable {
+    font-size: 0.700rem;
+}
+
+.truncate {
+    max-width: 50px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.dataTables_wrapper {
+    font-size: 0.700rem !important;
+}
+
+.tooltip1 {
+    position: relative;
+    display: inline-block;
+    border-bottom: 1px dotted black;
+}
+
+    .tooltip1 .tooltiptext1 {
+        visibility: hidden;
+        min-width: 300px;
+        background-color: #555;
+        color: #fff;
+        text-align: center;
+        border-radius: 6px;
+        padding: 5px 0;
+        position: absolute;
+        z-index: 1;
+        bottom: 125%;
+        left: 50%;
+        margin-left: -60px;
+        opacity: 0;
+        transition: opacity 0.3s;
+    }
+
+        .tooltip1 .tooltiptext1::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #555 transparent transparent transparent;
+        }
+
+    .tooltip1:hover .tooltiptext1 {
+        visibility: visible;
+        opacity: 1;
+    }

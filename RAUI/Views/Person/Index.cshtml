@@ -4,70 +4,8 @@
 <script src="~/datatable/datatables.min.js"></script>
 <script src="~/datatable/bootstrap-5-5.1.3/js/bootstrap.bundle.min.js"></script>
 <script src="~/datatable/datatables-1.13.1/js/datatables.bootstrap5.min.js"></script>
-<style>
-    .listtable {
-        font-size: 0.700rem;
-        border: 1px !important;
-        border-width: 2px 0 0 0 !important;
-        border-color: #e3e3e3 !important;
-    }
 
-    table.dataTable {
-        font-size: 0.700rem;
-    }
 
-    .truncate {
-        max-width: 50px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
-    .dataTables_wrapper {
-        font-size: 0.700rem !important;
-    }
-
-    .tooltip1 {
-        position: relative;
-        display: inline-block;
-        border-bottom: 1px dotted black;
-    }
-
-        .tooltip1 .tooltiptext1 {
-            visibility: hidden;
-            min-width: 300px;
-            background-color: #555;
-            color: #fff;
-            text-align: center;
-            border-radius: 6px;
-            padding: 5px 0;
-            position: absolute;
-            z-index: 1;
-            bottom: 125%;
-            left: 50%;
-            margin-left: -60px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-            .tooltip1 .tooltiptext1::after {
-                content: "";
-                position: absolute;
-                top: 100%;
-                left: 50%;
-                margin-left: -5px;
-                border-width: 5px;
-                border-style: solid;
-                border-color: #555 transparent transparent transparent;
-            }
-
-        .tooltip1:hover .tooltiptext1 {
-            visibility: visible;
-            opacity: 1;
-        }
-</style>
-@{
-}
 <div class="container container-fluid">
     <div class="row">
         <div class="col">
@@ -78,21 +16,11 @@
         <div class="col">
             <div class="row">
                 <div class="col w-100">
-                    
                 </div>
             </div>
             <div class="row">
                 <div class="col">
                     <table id="tblPersonList" class="table table-striped listtable">
-                        <tr>
-                            <th></th>
-                            <th>Adı</th>
-                            <th>Soyadı</th>
-                            <th>Firma</th>
-                            <th>İletişim Bilgisi</th>
-                            <th>İşlem</th>
-                        </tr>
-
                     </table>
                 </div>
             </div>
@@ -109,6 +37,7 @@
             </div>
             <div class="modal-body">
                 <div class="container-fluid">
+                    @Html.Hidden("Id")
                     @Html.Hidden("UUID")
                     <div class="form-floating mb-2">
                         <input type="text" id="Name" class="form-control form-control-sm" placeholder="Adı">
@@ -129,7 +58,7 @@
                                     <tr>
                                         <th>Telefon No</th>
                                         <th>E-Posta</th>
-                                        <th>Lokasyon</th>                                        
+                                        <th>Lokasyon</th>
                                     </tr>
                                 </thead>
 
@@ -140,7 +69,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sml" data-bs-dismiss="modal">Kapat</button>
-                <button type="button" class="btn btn-primary btn-sml"><i class="fa fa-save"></i> Kaydet</button>
+                <button type="button" id="btnSavePerson" class="btn btn-primary btn-sml"><i class="fa fa-save"></i> Kaydet</button>
             </div>
         </div>
     </div>
@@ -158,26 +87,26 @@
                     <div class="row">
                         <div class="col">
                             Adı
-                        </div>                        
+                        </div>
                         <div class="col">
                             Soyadı
-                        </div>                        
+                        </div>
                         <div class="col">
                             Firma Adı
-                        </div>                        
+                        </div>
                     </div>
-                    <div class="row">                        
+                    <div class="row">
                         <div class="col">
                             <span class="fw-bold" id="spnName"></span>
-                        </div>                        
+                        </div>
                         <div class="col">
                             <span class="fw-bold" id="spnSurname"></span>
-                        </div>                        
+                        </div>
                         <div class="col">
                             <span class="fw-bold" id="spnCompanyName"></span>
                         </div>
                     </div>
-                    
+                    @Html.Hidden("ContactId")
                     @Html.Hidden("ContactUUID")
                     <div class="form-floating mb-2">
                         <input type="tel" id="PhoneNumber" class="form-control form-control-sm" placeholder="Telefon No">
@@ -202,7 +131,7 @@
                                         <th>İşlem</th>
                                     </tr>
                                 </thead>
-                                
+
                             </table>
                         </div>
                     </div>
@@ -210,7 +139,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary btn-sml" data-bs-dismiss="modal">Kapat</button>
-                <button type="button" class="btn btn-primary btn-sml"><i class="fa fa-save"></i> Kaydet</button>
+                <button type="button" id="btnSaveContactInfo" class="btn btn-primary btn-sml"><i class="fa fa-save"></i> Kaydet</button>
             </div>
         </div>
     </div>
@@ -218,9 +147,10 @@
 
 <script>
     var tblPersonList = $('#tblPersonList').DataTable({
-        select: true,        
+        serverSide: true,
+        select: true,
         paging: true,
-        ordering: true,        
+        ordering: true,
         columnDefs: [{ targets: [1, 2], className: "truncate" }],
         fnCreatedRow: function (nRow, aData, iDataIndex) {
             $(nRow).attr('id', aData["UUID"]);
@@ -230,13 +160,12 @@
         },
         language: {
             url: "/datatable/i18n/tr.json"
-        },        
+        },
         order: [[2, "desc"]],
 
         ajax: {
             url: "/Person/PersonDtoData",
-            method: "POST",
-            data: {}
+            method: "POST"
         },
         columns: [
             { data: 'UUID', title: "Kayıt No", orderable: false, visible: false, name: 'UUID' },
@@ -264,10 +193,10 @@
                 }
             },
             {
-                data: "UUID",
+                data: "Id",
                 title: "İşlem",
-                name: "UUID",
-                width:"25%",
+                name: "Id",
+                width: "25%",
                 render: function (data, type, row, meta) {
                     var rowValue = '';
                     if (data != null && data != undefined && data != '') {
@@ -276,10 +205,10 @@
 
                     if (rowValue)
                         htmlStr = `<div class="btn-group btn-group-sm" role="group" aria-label="tblAccessButtons">
-                            <button class='btn btn-sm btn-outline-info btnAddContact' type='button' id='btnAddContact_` + rowValue + `' data-id='` + rowValue + `' ><i class='fa fa-address-book '></i> İletişim Bilgisi Düzenle</button>
-                                        <button class='btn btn-sm btn-outline-warning btnDetail' type='button' id='btnDetail_` + rowValue + `' data-id="` + rowValue + `"><i class='fa fa-search'></i> Düzenle</button>
-                                        <button class='btn btn-sm btn-outline-danger btnDelete' type='button' id='btnDelete_` + rowValue + `' data-id='` + rowValue + `' ><i class='fa fa-trash'></i> Sil</button>                                                
-                                        </div>`;
+                                    <button class='btn btn-sm btn-outline-info btnAddContact' type='button' id='btnAddContact_` + rowValue + `' data-id='` + rowValue + `' ><i class='fa fa-address-book '></i> İletişim Bilgisi Düzenle</button>
+                                                <button class='btn btn-sm btn-outline-warning btnDetail' type='button' id='btnDetail_` + rowValue + `' data-id="` + rowValue + `"><i class='fa fa-search'></i> Düzenle</button>
+                                                <button class='btn btn-sm btn-outline-danger btnDelete' type='button' id='btnDelete_` + rowValue + `' data-id='` + rowValue + `' ><i class='fa fa-trash'></i> Sil</button>
+                                                </div>`;
 
                     return htmlStr;
                 }
@@ -291,12 +220,13 @@
         }
 
     });
-    
-    $('#tblPersonList').delegate('.btnDetail', 'click', function () {        
+
+    $('#tblPersonList').delegate('.btnDetail', 'click', function () {
         var recordId = $(this).data('id');
         var tableData = tblPersonList.rows().data();
-        var selectedRow = $.grep(tableData, function (e) { return e.UUID == recordId });
-        $('#UUID').val(recordId);
+        var selectedRow = $.grep(tableData, function (e) { return e.Id == recordId });
+        $('#Id').val(recordId);
+        $('#UUID').val(selectedRow[0].UUID);
         $('#Name').val(selectedRow[0].Name);
         $('#Surname').val(selectedRow[0].Surname);
         $('#CompanyName').val(selectedRow[0].CompanyName);
@@ -304,7 +234,55 @@
         $('#mdlPersonDetail').modal('show');
     });
 
-    $('.container').delegate('#btnAddPerson','click',function(){        
+    $('#mdlPersonDetail').delegate('#btnSavePerson', 'click', function () {
+        var recordId = $('#Id').val();
+        
+        var person = {
+            Id: recordId,
+            UUID: $('#UUID').val(),
+            Name: $('#Name').val(),
+            Surname: $('#Surname').val(),
+            CompanyName: $('#CompanyName').val()            
+        }
+        debugger
+        var tableData = tblPersonList.rows().data();
+        var selectedRow = $.grep(tableData, function (e) { return e.Id == recordId });
+        if(selectedRow.length > 0)
+        if(selectedRow[0].ContactInfos != null && selectedRow[0].ContactInfos.length > 0)
+            person.ContactInfos =  selectedRow[0].ContactInfos;
+
+        PostAjaxWithData({ url: "/Person/PersonCreate", data: { model: person } }, SavePersonSuccess);
+    });
+
+    function SavePersonSuccess(data) {
+        if (data.ServiceState)
+            if (data.RequestState) {
+                $('#mdlPersonDetail').modal('hide');
+                RefreshListDataTable('#tblPersonList');
+            }
+            else
+                ShowWarningMessage({ Text: "İşleminizde hata oluştu." + data.ErrorMsg });
+        else
+            ShowWarningMessage({ Text: "Serviste hata oluştu." + data.ErrorMsg });
+
+        console.log(data);
+    }
+
+    $('#tblPersonList').delegate('.btnDelete', 'click', function () {
+        var recordId = $(this).data('id');
+        ShowWarningMessage({
+            cancelButton: "Hayır",
+            deleteUrl: '/Person/PersonDelete',
+            deleteData: { Id: recordId },
+            deleteDatatable: tblPersonList,
+            successButton: "Evet",
+            text: "Kaydı silmek istiyor musunuz?"
+        });
+    });
+
+
+    $('.container').delegate('#btnAddPerson', 'click', function () {
+        $('#Id').val('');
         $('#UUID').val('');
         $('#Name').val('');
         $('#Surname').val('');
@@ -318,76 +296,155 @@
         ordering: true,
         order: [[0, "desc"]],
         searching: false,
+        language: {
+            url: "/datatable/i18n/tr.json"
+        },
         columns: [
             { data: 'PhoneNumber', title: "Telefon No", name: 'PhoneNumber' },
             { data: 'Email', title: "E-Posta", name: 'Email' },
-            { data: 'Location', title: "Lokasyon", name: 'Location' }            
+            { data: 'Location', title: "Lokasyon", name: 'Location' }
         ]
     });
-        
+
     var contactTable = $('#tblContactInfoEdit').DataTable({
-            select: true,
-            paging: false,
-            ordering: true,
-            order: [[0, "desc"]],
-            searching: false,
-            columns: [                
-                { data: 'PhoneNumber', title: "Telefon No", name: 'PhoneNumber'},
-                { data: 'Email', title: "E-Posta", name: 'Email'},
-                { data: 'Location', title: "Lokasyon", name: 'Location'},
-                {
-                    data: "PhoneNumber",
-                    title: "İşlem",
+        select: true,
+        paging: false,
+        ordering: true,
+        order: [[0, "desc"]],
+        searching: false,
+        language: {
+            url: "/datatable/i18n/tr.json"
+        },
+        columnDefs: [{ targets: 0, className: "truncate" }],
+        columns: [
+            { data: 'PhoneNumber', title: "Telefon No", name: 'PhoneNumber' },
+            { data: 'Email', title: "E-Posta", name: 'Email' },
+            { data: 'Location', title: "Lokasyon", name: 'Location' },
+            {
+                data: "PhoneNumber",
+                title: "İşlem",
                 name: "PhoneNumber",
                 render: function (data, type, row, meta) {
-                        var rowValue = '';
-                        if (data != null && data != undefined && data != '') {
-                            rowValue = data;
-                        }
-
-                        if (rowValue)
-                        htmlStr = `<button class='btn btn-sm btn-outline-warning btnEditContact' type='button' id='btnEditContact_` + rowValue + `' data-id='` + rowValue + `' data-phonenumber='` + row.PhoneNumber + `' data-email='` + row.Email + `' data-location='` + row.Location + `'><i class='fa fa-address-book '></i>Seç</button>`;
-
-                        return htmlStr;
+                    var rowValue = '';
+                    if (data != null && data != undefined && data != '') {
+                        rowValue = data;
                     }
+
+                    if (rowValue)
+                        htmlStr = `<button class='btn btn-sm btn-outline-warning btnEditContact' type='button' id='btnEditContact_` + rowValue + `' data-id='` + rowValue + `' data-phonenumber='` + row.PhoneNumber + `' data-email='` + row.Email + `' data-location='` + row.Location + `'><i class='fa fa-address-book '></i>Seç</button>
+                                          <button class='btn btn-sm btn-outline-danger btnDeleteContact' type='button' id='btnDeleteContact_` + rowValue + `' data-id='` + rowValue + `' data-phonenumber='` + row.PhoneNumber + `' data-email='` + row.Email + `' data-location='` + row.Location + `'><i class='fa fa-trash'></i>Sil</button>`;
+
+                    return htmlStr;
                 }
-            ]
-        });
-    
+            }
+        ]
+    });
+
 
     $('#tblPersonList').delegate('.btnAddContact', 'click', function () {
-        
+
         var recordId = $(this).data('id');
         var tableData = tblPersonList.rows().data();
-        var selectedRow = $.grep(tableData, function (e) { return e.UUID == recordId });
+        var selectedRow = $.grep(tableData, function (e) { return e.Id == recordId });
         $('#PhoneNumber').val('');
         $('#Email').val('');
         $('#Location').val('');
-        $('#ContactUUID').val(recordId);
+        $('#ContactId').val(recordId);
+        $('#ContactUUID').val(selectedRow[0].UUID);
         $('#spnName').empty().append(selectedRow[0].Name);
         $('#spnSurname').empty().append(selectedRow[0].Surname);
         $('#spnCompanyName').empty().append(selectedRow[0].CompanyName);
-        RefreshDataTable('#tblContactInfoEdit',selectedRow[0].ContactInfos);
+        RefreshDataTable('#tblContactInfoEdit', selectedRow[0].ContactInfos);
         $('#mdlContactInfo').modal('show');
     });
 
-    $('#tblContactInfoEdit').delegate('.btnEditContact', 'click', function () {                
+    $('#tblContactInfoEdit').delegate('.btnEditContact', 'click', function () {
         $('#PhoneNumber').val($(this).data('phonenumber'));
         $('#Email').val($(this).data('email'));
-        $('#Location').val($(this).data('location'));        
+        $('#Location').val($(this).data('location'));
     });
-    
-    function RefreshDataTable(tableId, newData) {
-        var dt = $(tableId).dataTable();
-        oSettings = dt.fnSettings();
-        dt.fnClearTable(this);
 
-        for (var i = 0; i < newData.length; i++) {
-            dt.oApi._fnAddData(oSettings, newData[i]);
+    $('#mdlContactInfo').delegate('#btnSaveContactInfo', 'click', function () {
+        var recordId = $('#ContactId').val();
+        var contactInfo = {
+            PhoneNumber: $('#PhoneNumber').val(),
+            Email: $('#Email').val(),
+            Location: $('#Location').val()
         }
+        var tableData = tblPersonList.rows().data();
+        var selectedPerson = $.grep(tableData, function (e) { return e.Id == recordId });
+        var contactAvailable = false;
+        $.each(selectedPerson[0].ContactInfos, function (idx, itm) {
+            if (itm.PhoneNumber === contactInfo.PhoneNumber &&
+                itm.Email === contactInfo.Email &&
+                itm.Location === contactInfo.Location)
+                contactAvailable = true;
+        });
 
-        oSettings.aiDisplay = oSettings.aiDisplayMaster.slice();
-        dt.fnDraw();        
-        return true;
+        if (!contactAvailable) {
+            selectedPerson[0].ContactInfos.push(contactInfo);
+            var person = selectedPerson[0];
+            PostAjaxWithData({ url: "/Person/PersonCreate", data: { model: person } }, SaveContactInfoSuccess);
+        }
+        else
+            ShowWarningMessage({ text: 'Girilen iletişim bilgisi kişi kaydında mevcut.' })
+
+    });
+    function SaveContactInfoSuccess(data) {
+        if (data.ServiceState)
+            if (data.RequestState) {
+                $('#PhoneNumber').val('');
+                $('#Email').val('');
+                $('#Location').val('');
+                RefreshListDataTable('#tblPersonList');
+                RefreshDataTable('#tblContactInfoEdit', data.Item.ContactInfos);
+            }
+            else
+                ShowWarningMessage({ Text: "İşleminizde hata oluştu." + data.ErrorMsg });
+        else
+            ShowWarningMessage({ Text: "Serviste hata oluştu." + data.ErrorMsg });
+
+        console.log(data);
     }
+
+
+    $('#tblContactInfoEdit').delegate('.btnDeleteContact', 'click', function () {
+        var recordId = $('#ContactId').val();  
+        
+        var phoneNumber= $(this).data('phonenumber');
+        var email= $(this).data('email');
+        var location= $(this).data('location');
+        
+        var tableData = tblPersonList.rows().data();
+        var selectedPerson = $.grep(tableData, function (e) { return e.Id == recordId });
+        var contactList = [];
+        $.each(selectedPerson[0].ContactInfos, function (idx, itm) {            
+            if (itm.PhoneNumber == phoneNumber && itm.Email == email && itm.Location == location)
+                console.log(itm);
+            else
+                contactList.push(itm);
+        });
+        
+        selectedPerson[0].ContactInfos = contactList;
+        var person = selectedPerson[0];
+        PostAjaxWithData({ url: "/Person/PersonCreate", data: { model: person } }, SaveContactInfoSuccess);
+    });
+    function SaveContactInfoSuccess(data) {
+        if (data.ServiceState)
+            if (data.RequestState) {
+                $('#PhoneNumber').val('');
+                $('#Email').val('');
+                $('#Location').val('');
+                RefreshListDataTable('#tblPersonList');
+                RefreshDataTable('#tblContactInfoEdit', data.Item.ContactInfos);
+            }
+            else
+                ShowWarningMessage({ Text: "İşleminizde hata oluştu.<br>" + data.ErrorMsg });
+        else
+            ShowWarningMessage({ Text: "Serviste hata oluştu.<br>" + data.ErrorMsg });
+
+        console.log(data);
+    }
+
+
 </script>

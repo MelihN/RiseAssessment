@@ -24,14 +24,14 @@ namespace RAServices.Controllers
             _mongoRepository = new MongoRepository(connectionString, dbName, "Person");
         }
         [HttpPost]
-        public async Task<ResponseModel<Person>> GetOne(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> GetOne(RequestModel<Person> requestModel)
         {
             var result = new ResponseModel<Person>();
 
             var postData = new DbModel<Person>()
             {
-                Item = person.Item,
-                RecordID = person.RecordId
+                Item = requestModel.Item,
+                RecordID = requestModel.RecordId
             };
 
             var data = await _mongoRepository.GetFindOne<Person>(postData);
@@ -45,15 +45,13 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public async Task<ResponseModel<Person>> GetList(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> GetList(RequestModel<Person> requestModel)
         {
             var result = new ResponseModel<Person>();
             var postData = new DbModel<Person>()
-            {
-                Item = person.Item,
-                RecordID = person.RecordId,
-                PagingStart = person.PagingStart,
-                PagingLength = person.PagingLength
+            {                
+                PagingStart = requestModel.PagingStart,
+                PagingLength = requestModel.PagingLength
             };
 
             var data = await _mongoRepository.GetDataList<Person>(postData);
@@ -67,13 +65,13 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public async Task<ResponseModel<Person>> Create(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> Create(RequestModel<Person> requestModel)
         {
             var result = new ResponseModel<Person>();
             var postData = new DbModel<Person>()
             {
-                Item = person.Item,
-                RecordID = person.RecordId
+                Item = requestModel.Item,
+                RecordID = requestModel.RecordId
             };
 
             var data = await _mongoRepository.InsertData<Person>(postData);
@@ -87,13 +85,13 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public async Task<ResponseModel<Person>> Update(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> Update(RequestModel<Person> requestModel)
         {
             var result = new ResponseModel<Person>();
             var postData = new DbModel<Person>()
             {
-                Item = person.Item,
-                RecordID = person.RecordId
+                Item = requestModel.Item,
+                RecordID = requestModel.RecordId
             };
             var data = await _mongoRepository.UpdateData<Person>(postData);
             result.Item = data.Item;
@@ -105,13 +103,13 @@ namespace RAServices.Controllers
         }
 
         [HttpPost]
-        public async Task<ResponseModel<Person>> Delete(RequestModel<Person> person)
+        public async Task<ResponseModel<Person>> Delete(RequestModel<Person> requestModel)
         {
             var result = new ResponseModel<Person>();
             var postData = new DbModel<Person>()
             {
-                Item = person.Item,
-                RecordID = person.RecordId
+                Item = requestModel.Item,
+                RecordID = requestModel.RecordId
             };
             var data = await _mongoRepository.DeleteData<Person>(postData);
             result.Item = null;
